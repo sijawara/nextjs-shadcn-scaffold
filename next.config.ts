@@ -5,6 +5,14 @@ const nextConfig: NextConfig = {
     // Allow dev server to be previewed across origins (required for remote previews)
     allowedDevOrigins: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
