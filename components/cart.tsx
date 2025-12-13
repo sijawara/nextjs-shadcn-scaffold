@@ -30,24 +30,21 @@ interface CartProps {
 export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="icon"
-        className="relative overflow-visible"
-        onClick={() => setIsOpen(true)}
-      >
-        <ShoppingCartIcon className="h-4 w-4" />
-        {items.length > 0 && (
-          <span className="absolute top-0 right-0 transform -translate-y-1/2 translate-x-2/3 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground ring-2 ring-background pointer-events-none z-10">
-            {items.length}
-          </span>
-        )}
-        <span className="sr-only">Open cart</span>
-      </Button>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="relative">
+            <ShoppingCartIcon className="h-4 w-4" />
+            {totalQuantity > 0 && (
+              <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                {totalQuantity}
+              </Badge>
+            )}
+          </Button>
+        </SheetTrigger>
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Shopping Cart</SheetTitle>
@@ -59,7 +56,7 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
             {items.length === 0 ? (
               <p className="text-center text-muted-foreground">Your cart is empty.</p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 p-4">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between">
                     <div className="flex-1">
@@ -102,7 +99,7 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
             )}
           </div>
           {items.length > 0 && (
-            <div className="border-t pt-4">
+            <div className="border-t p-4">
               <div className="flex items-center justify-between font-semibold">
                 <span>Total:</span>
                 <span>Rp {total.toLocaleString('id-ID')}</span>
