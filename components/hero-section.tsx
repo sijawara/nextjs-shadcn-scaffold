@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function HeroSection() {
     return (
@@ -13,8 +14,12 @@ export function HeroSection() {
                 Discover a carefully curated collection of premium products designed for modern creators. Build something incredible with our state-of-the-art platform.
             </p>
             <div className="mt-12 flex items-center justify-center gap-x-6">
-                <Button size="lg" className="h-14 px-8 text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform">Get Started Now</Button>
-                <Button variant="outline" size="lg" className="h-14 px-8 text-lg font-bold rounded-xl border-2 hover:bg-muted transition-colors">Explore Features</Button>
+                <Link href="/products">
+                    <Button size="lg" className="h-14 px-8 text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform">Get Started Now</Button>
+                </Link>
+                <Link href="/products">
+                    <Button variant="outline" size="lg" className="h-14 px-8 text-lg font-bold rounded-xl border-2 hover:bg-muted transition-colors">Explore Collection</Button>
+                </Link>
             </div>
         </section>
     )

@@ -16,7 +16,8 @@ interface ProductCardProps {
   tags?: string[]
 }
 
-import { IconShoppingCart, IconArrowRight } from "@tabler/icons-react"
+import { useRef, useState, useEffect } from "react"
+import { IconShoppingCart, IconArrowRight, IconChevronRight } from "@tabler/icons-react"
 
 export function ProductCard({
   id,
@@ -27,6 +28,21 @@ export function ProductCard({
   tags,
 }: ProductCardProps) {
   const { addItem } = useCart()
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [showChevron, setShowChevron] = useState(false)
+
+  const checkOverflow = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
+      setShowChevron(scrollLeft + clientWidth < scrollWidth - 5)
+    }
+  }
+
+  useEffect(() => {
+    checkOverflow()
+    window.addEventListener('resize', checkOverflow)
+    return () => window.removeEventListener('resize', checkOverflow)
+  }, [tags])
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -41,9 +57,9 @@ export function ProductCard({
 
   return (
     <Link href={`/products/${id}`} className="group block">
-      <Card className="overflow-hidden border-border/50 bg-card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 rounded-3xl cursor-pointer">
+      <Card className="overflow-hidden border-border/50 bg-card hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 rounded-3xl cursor-pointer p-0">
         <CardHeader className="p-0 relative">
-          <div className="aspect-[4/5] relative overflow-hidden bg-muted">
+          <div className="aspect-[4/3] relative overflow-hidden bg-muted">
             <Image
               src={image}
               alt={title}
@@ -71,23 +87,42 @@ export function ProductCard({
             <CardTitle className="text-xl font-bold leading-tight group-hover:text-primary transition-colors line-clamp-1">
               {title}
             </CardTitle>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black tracking-tight text-foreground">
-                Rp {price.toLocaleString('id-ID')}
-              </span>
-              <span className="text-sm text-muted-foreground line-through opacity-50">
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black tracking-tight text-foreground">
+                  Rp {price.toLocaleString('id-ID')}
+                </span>
+              </div>
+              <span className="text-xs text-muted-foreground/50 line-through">
                 Rp {(price * 1.2).toLocaleString('id-ID')}
               </span>
             </div>
           </div>
 
           {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {tags.slice(0, 3).map((tag, index) => (
-                <span key={index} className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50">
-                  {tag}
-                </span>
-              ))}
+            <div
+              className="relative mt-4 group/tags"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }}
+            >
+              <div
+                ref={scrollRef}
+                onScroll={checkOverflow}
+                className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth"
+              >
+                {tags.map((tag, index) => (
+                  <span key={index} className="flex-shrink-0 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border/50">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {showChevron && (
+                <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-card to-transparent flex items-center justify-end pointer-events-none">
+                  <IconChevronRight className="h-3 w-3 text-muted-foreground animate-pulse" />
+                </div>
+              )}
             </div>
           )}
         </CardContent>

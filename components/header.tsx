@@ -18,7 +18,10 @@ export function Header({ showCart = true }: HeaderProps) {
                 <Link href="/" className="flex items-center space-x-2">
                     <span className="text-xl font-bold">Our Platform</span>
                 </Link>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-6">
+                    <Link href="/products" className="text-sm font-semibold hover:text-primary transition-colors">
+                        Products
+                    </Link>
                     {showCart && (
                         <Cart
                             items={items}

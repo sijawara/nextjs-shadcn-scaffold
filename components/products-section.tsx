@@ -1,5 +1,7 @@
 import { ProductCard } from "@/components/product-card"
 import { products } from "@/data/products"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export function ProductsSection() {
     return (
@@ -25,6 +27,13 @@ export function ProductsSection() {
                         tags={product.tags}
                     />
                 ))}
+            </div>
+            <div className="mt-16 text-center">
+                <Link href="/products">
+                    <Button variant="outline" size="lg" className="rounded-xl border-2 hover:bg-muted font-bold px-8 h-12 shadow-lg shadow-primary/5">
+                        View All Products
+                    </Button>
+                </Link>
             </div>
         </section>
     )

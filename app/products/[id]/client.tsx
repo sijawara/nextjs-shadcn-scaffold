@@ -39,7 +39,7 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
             </li>
             <li className="flex items-center space-x-2 text-muted-foreground/50">
               <IconChevronRight className="h-4 w-4" />
-              <span className="hover:text-primary transition-colors cursor-pointer text-foreground/70">Products</span>
+              <Link href="/products" className="hover:text-primary transition-colors text-foreground/70 font-medium">Products</Link>
             </li>
             <li className="flex items-center space-x-2 text-muted-foreground/50">
               <IconChevronRight className="h-4 w-4" />
