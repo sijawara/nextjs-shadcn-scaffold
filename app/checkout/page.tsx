@@ -14,13 +14,16 @@ export default function CheckoutPage() {
   const { items, clearCart, getTotal } = useCartStore()
   const router = useRouter()
   const total = getTotal()
-  const { handlePayment, isLoading, error } = useMidtransPayment({ amount: total })
+  const { handlePayment, isLoading } = useMidtransPayment({ amount: total })
 
   const handleCheckout = async () => {
-    await handlePayment()
-    // Clear cart after payment (in a real app, you'd wait for payment confirmation)
-    clearCart()
-    router.push('/')
+    const success = await handlePayment()
+
+    if (success) {
+      // Clear cart after payment (in a real app, you'd wait for payment confirmation)
+      clearCart()
+      router.push('/')
+    }
   }
 
   const generateWhatsAppMessage = () => {
@@ -129,7 +132,6 @@ export default function CheckoutPage() {
                 >
                   Konfirmasi via WhatsApp
                 </Button>
-                {error && <p className="text-sm text-red-500">{error}</p>}
               </CardContent>
             </Card>
           </div>

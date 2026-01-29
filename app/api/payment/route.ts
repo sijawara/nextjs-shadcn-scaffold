@@ -5,9 +5,18 @@ const midtransClient = require('midtrans-client');
 export async function POST(request: NextRequest) {
   const { amount = 10000 } = await request.json();
 
+  const serverKey = process.env.MIDTRANS_SERVER_KEY;
+
+  if (!serverKey) {
+    return NextResponse.json(
+      { error: 'Midtrans Server Key is not configured. Please add MIDTRANS_SERVER_KEY to your environment variables.' },
+      { status: 500 }
+    );
+  }
+
   const snap = new midtransClient.Snap({
     isProduction: false,
-    serverKey: process.env.MIDTRANS_SERVER_KEY,
+    serverKey: serverKey,
   });
 
   const parameter = {

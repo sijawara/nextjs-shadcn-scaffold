@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface UseMidtransPaymentProps {
   amount: number;
@@ -8,16 +9,14 @@ interface UseMidtransPaymentProps {
 
 export function useMidtransPayment({ amount }: UseMidtransPaymentProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const handlePayment = async () => {
+  const handlePayment = async (): Promise<boolean> => {
     if (amount <= 0) {
-      setError('Please enter a valid amount');
-      return;
+      toast.error('Please enter a valid amount');
+      return false;
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch('/api/payment', {
@@ -25,14 +24,20 @@ export function useMidtransPayment({ amount }: UseMidtransPaymentProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount }),
       });
+
       const data = await response.json();
+
       if (data.token) {
         window.open(`https://app.sandbox.midtrans.com/snap/v2/vtweb/${data.token}`, '_blank');
+        return true;
       } else {
-        setError('Error: ' + data.error);
+        const errorMsg = data.error || 'Payment failed. Please try again.';
+        toast.error(errorMsg);
+        return false;
       }
     } catch (err) {
-      setError('Payment failed. Please try again.');
+      toast.error('Payment failed. Please try again.');
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -41,6 +46,5 @@ export function useMidtransPayment({ amount }: UseMidtransPaymentProps) {
   return {
     handlePayment,
     isLoading,
-    error,
   };
 }
