@@ -23,8 +23,6 @@ export function ProductsSection() {
                         image={product.image}
                         title={product.title}
                         price={product.price}
-                        badge={product.badge}
-                        tags={product.tags}
                     />
                 ))}
             </div>
