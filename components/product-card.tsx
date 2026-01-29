@@ -12,7 +12,6 @@ interface ProductCardProps {
   image: string
   title: string
   price: number
-  description: string
   badge?: string
   tags?: string[]
 }
@@ -22,13 +21,14 @@ export function ProductCard({
   image,
   title,
   price,
-  description,
   badge,
   tags,
 }: ProductCardProps) {
   const { addItem } = useCart()
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     addItem({
       id,
       name: title,
@@ -57,7 +57,6 @@ export function ProductCard({
         </CardHeader>
         <CardContent>
           <CardTitle className="text-lg">{title}</CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">{description}</p>
           {tags && tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-3">
               {tags.map((tag, index) => (

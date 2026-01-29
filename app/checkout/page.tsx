@@ -23,14 +23,23 @@ export default function CheckoutPage() {
     router.push('/')
   }
 
+  const generateWhatsAppMessage = () => {
+    let message = "Konfirmasi Pesanan:\n\n"
+    items.forEach(item => {
+      message += `${item.name} - Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity} = Rp ${(item.price * item.quantity).toLocaleString('id-ID')}\n`
+    })
+    message += `\nTotal: Rp ${total.toLocaleString('id-ID')}\n\nSilakan konfirmasi pesanan saya.`
+    return encodeURIComponent(message)
+  }
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-8">Add some products to your cart before checking out.</p>
+          <h1 className="text-3xl font-bold mb-4">Keranjang Anda kosong</h1>
+          <p className="text-muted-foreground mb-8">Tambahkan beberapa produk ke keranjang Anda sebelum checkout.</p>
           <Link href="/">
-            <Button>Continue Shopping</Button>
+            <Button>Lanjutkan Belanja</Button>
           </Link>
         </div>
       </div>
@@ -44,21 +53,21 @@ export default function CheckoutPage() {
         <div className="container mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
+            Lanjutkan Belanja
           </Link>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold mb-8">Pembayaran</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Order Summary */}
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
-                <CardDescription>Review your items</CardDescription>
+                <CardTitle>Ringkasan Pesanan</CardTitle>
+                <CardDescription>Tinjau item Anda</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {items.map((item) => (
@@ -95,13 +104,13 @@ export default function CheckoutPage() {
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Payment</CardTitle>
-                <CardDescription>Complete your purchase</CardDescription>
+                <CardTitle>Pembayaran</CardTitle>
+                <CardDescription>Selesaikan pembelian Anda</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    You will be redirected to Midtrans to complete your payment securely.
+                    Anda akan diarahkan ke Midtrans untuk menyelesaikan pembayaran dengan aman.
                   </p>
                 </div>
                 <Button
@@ -110,7 +119,15 @@ export default function CheckoutPage() {
                   size="lg"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Processing...' : `Pay Rp ${total.toLocaleString('id-ID')}`}
+                  {isLoading ? 'Memproses...' : `Bayar Rp ${total.toLocaleString('id-ID')}`}
+                </Button>
+                <Button
+                  onClick={() => window.open(`https://wa.me/?text=${generateWhatsAppMessage()}`, '_blank')}
+                  className="w-full"
+                  size="lg"
+                  variant="outline"
+                >
+                  Konfirmasi via WhatsApp
                 </Button>
                 {error && <p className="text-sm text-red-500">{error}</p>}
               </CardContent>

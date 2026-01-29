@@ -36,7 +36,7 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
-            Back to Products
+            Kembali ke Produk
           </Link>
           <Cart
             items={items}
@@ -66,14 +66,14 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
                   <button
                     onClick={prevImage}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-                    aria-label="Previous image"
+                    aria-label="Gambar sebelumnya"
                   >
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
                     onClick={nextImage}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-                    aria-label="Next image"
+                    aria-label="Gambar berikutnya"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
@@ -93,7 +93,7 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
                         ? 'bg-primary'
                         : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                     }`}
-                    aria-label={`Go to image ${index + 1}`}
+                    aria-label={`Ke gambar ${index + 1}`}
                   />
                 ))}
               </div>
@@ -115,16 +115,9 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
               Rp {product.price.toLocaleString('id-ID')}
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Description</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </div>
-
             {product.tags && product.tags.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Features</h2>
+                <h2 className="text-xl font-semibold">Fitur</h2>
                 <div className="flex flex-wrap gap-2">
                   {product.tags.map((tag, index) => (
                     <Badge key={index} variant="secondary">
@@ -146,7 +139,7 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
                   image: product.image,
                 })}
               >
-                Add to Cart
+                Tambah ke Keranjang
               </Button>
               <Button
                 variant="outline"
@@ -162,10 +155,16 @@ export function ProductDetailClient({ product }: { product: typeof products[0] }
                   router.push('/checkout')
                 }}
               >
-                Buy Now
+                Beli Sekarang
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Product Description */}
+        <div className="mt-12 space-y-4">
+          <h2 className="text-2xl font-semibold">Deskripsi Produk</h2>
+          <div className="text-muted-foreground leading-relaxed" dangerouslySetInnerHTML={{ __html: product.description }} />
         </div>
       </main>
     </div>

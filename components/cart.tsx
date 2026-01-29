@@ -47,14 +47,14 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
         </SheetTrigger>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>Shopping Cart</SheetTitle>
+            <SheetTitle>Keranjang Belanja</SheetTitle>
             <SheetDescription>
-              Review your items and proceed to checkout.
+              Tinjau item Anda dan lanjutkan ke pembayaran.
             </SheetDescription>
           </SheetHeader>
           <div className="flex flex-col gap-4 py-4">
             {items.length === 0 ? (
-              <p className="text-center text-muted-foreground">Your cart is empty.</p>
+              <p className="text-center text-muted-foreground">Keranjang Anda kosong.</p>
             ) : (
               <div className="space-y-4 p-4">
                 {items.map((item) => (
@@ -90,7 +90,7 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
                         size="sm"
                         onClick={() => onRemoveItem?.(item.id)}
                       >
-                        Remove
+                        Hapus
                       </Button>
                     </div>
                   </div>
@@ -105,7 +105,7 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
                 <span>Rp {total.toLocaleString('id-ID')}</span>
               </div>
               <Link href="/checkout">
-                <Button className="w-full mt-4" onClick={() => setIsOpen(false)}>Proceed to Checkout</Button>
+                <Button className="w-full mt-4" onClick={() => setIsOpen(false)}>Lanjutkan ke Pembayaran</Button>
               </Link>
             </div>
           )}
