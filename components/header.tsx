@@ -5,7 +5,11 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { useCartStore } from "@/lib/cart-context"
 import Link from "next/link"
 
-export function Header() {
+interface HeaderProps {
+    showCart?: boolean
+}
+
+export function Header({ showCart = true }: HeaderProps) {
     const { items, removeItem, updateQuantity } = useCartStore()
 
     return (
@@ -15,11 +19,13 @@ export function Header() {
                     <span className="text-xl font-bold">Our Platform</span>
                 </Link>
                 <div className="flex items-center gap-4">
-                    <Cart
-                        items={items}
-                        onRemoveItem={removeItem}
-                        onUpdateQuantity={updateQuantity}
-                    />
+                    {showCart && (
+                        <Cart
+                            items={items}
+                            onRemoveItem={removeItem}
+                            onUpdateQuantity={updateQuantity}
+                        />
+                    )}
                     <ThemeToggle />
                 </div>
             </div>

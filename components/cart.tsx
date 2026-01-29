@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { ShoppingCartIcon } from "lucide-react"
+import { IconShoppingCart } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -37,7 +37,7 @@ export function Cart({ items, onRemoveItem, onUpdateQuantity }: CartProps) {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="relative">
-            <ShoppingCartIcon className="h-4 w-4" />
+            <IconShoppingCart className="h-4 w-4" />
             {totalQuantity > 0 && (
               <Badge className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
                 {totalQuantity}

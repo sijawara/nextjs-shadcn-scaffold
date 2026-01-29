@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft } from 'lucide-react'
+import { IconArrowLeft } from '@tabler/icons-react'
 import { useCartStore } from '@/lib/cart-context'
 import { useMidtransPayment } from '@/hooks/use-midtrans-payment'
 
@@ -52,7 +52,7 @@ export default function CheckoutPage() {
       <header className="border-b">
         <div className="container mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
+            <IconArrowLeft className="h-4 w-4" />
             Lanjutkan Belanja
           </Link>
         </div>
