@@ -1,127 +1,143 @@
-# Database Guide (Drizzle ORM + Turso)
+# Panduan Database Drizzle ORM dan Turso
 
-Dokumentasi ini menjelaskan pengelolaan data layer menggunakan **Drizzle ORM** dengan **Turso (libSQL)** sebagai database SQLite terdistribusi.
+Dokumentasi ini menjelaskan pengelolaan database menggunakan Drizzle ORM dengan Turso (libSQL). Panduan ini wajib diikuti agar integritas data dan keamanan tipe tetap terjaga.
 
-## 🛠 Struktur File
+## Aturan Utama
 
-* `db/schema.ts`: Definisi tabel, relasi, dan tipe data TypeScript.
-* `db/index.ts`: Inisialisasi koneksi database menggunakan `@libsql/client`.
-* `drizzle.config.ts`: Konfigurasi utama untuk Drizzle Kit (generator migrasi).
-* `.env`: Penyimpanan kredensial sensitif (URL & Auth Token).
+### Hal yang Harus Dilakukan
+- Gunakan Relations API untuk query relasional. Cara ini lebih aman dibanding menulis join manual.
+- Selalu jalankan pemeriksaan tipe menggunakan tsc setelah mengubah skema database.
+- Gunakan query builder bawaan Drizzle atau binding parameter untuk mencegah SQL Injection.
+- Gunakan operasi batch jika ingin memproses banyak data sekaligus untuk menghemat latensi.
 
----
+### Hal yang Dilarang
+- Jangan menyisipkan input pengguna secara langsung ke raw SQL query. Gunakan helper sql jika terpaksa menulis SQL mentah.
+- Jangan melakukan query database di dalam presentational component. Pindahkan query ke Server Component, Route Handler, atau Server Action.
 
-## ⚙️ Konfigurasi Database
+## Struktur Berkas
 
-### 1. Setup Environment
+- db/schema.ts: Definisi tabel dan relasi.
+- db/index.ts: Inisialisasi koneksi database.
+- drizzle.config.ts: Konfigurasi Drizzle Kit.
 
-Pastikan file `.env` kamu memiliki variabel berikut:
+## Alur Kerja Modifikasi Skema
 
-```env
-TURSO_DATABASE_URL=libsql://your-database-name.turso.io
-TURSO_AUTH_TOKEN=your-secret-auth-token
+1. Ubah skema database di db/schema.ts.
+2. Jalankan pnpm db:push di lingkungan pengembangan lokal untuk menyelaraskan database.
+3. Jalankan pnpm db:generate diikuti pnpm db:migrate di lingkungan production untuk menerapkan migrasi formal.
+4. Verifikasi seluruh berkas kode dengan tsc untuk memastikan tidak ada tipe data yang bermasalah.
 
-```
+### Alternatif Jika db:push Gagal atau Memerlukan Konfirmasi
 
-### 2. Drizzle Config (`drizzle.config.ts`)
+Jika pnpm db:push gagal, macet, atau meminta konfirmasi interaktif karena perubahan skema yang berisiko menghapus data, lakukan eksekusi SQL secara manual:
 
-Konfigurasi ini digunakan oleh Drizzle Kit untuk proses migrasi dan *prototyping*.
-
-```ts
-import 'dotenv/config';
-import { defineConfig } from 'drizzle-kit';
-
-export default defineConfig({
-  schema: './db/schema.ts',
-  out: './drizzle',
-  dialect: 'turso', // Dialek khusus untuk optimasi Turso/libSQL
-  dbCredentials: {
-    url: process.env.TURSO_DATABASE_URL!,
-    authToken: process.env.TURSO_AUTH_TOKEN!,
-  },
-});
-
-```
-
----
-
-## 🔄 Workflow Perubahan Schema
-
-### A. Development (Iterasi Cepat)
-
-Gunakan perintah ini untuk langsung menyelaraskan database dengan schema tanpa membuat file migrasi. Cocok untuk fase awal pengembangan.
-
-```bash
-pnpm db:push
-
-```
-
-### B. Production (Migrasi Terkontrol)
-
-1. **Generate**: Buat file SQL migrasi berdasarkan perubahan di `schema.ts`.
-```bash
-pnpm db:generate
-
-```
-
-
-2. **Migrate**: Terapkan file SQL tersebut ke database production.
-```bash
-pnpm db:migrate
-
-```
+1. Buat berkas migrasi SQL secara non-interaktif:
+   ```bash
+   pnpm db:generate
+   ```
+2. Temukan berkas SQL migrasi terbaru di dalam folder drizzle (misalnya: drizzle/0000_xxxx.sql).
+3. Buat dan jalankan skrip Node.js untuk mengeksekusi SQL tersebut:
+   ```ts
+   import { createClient } from "@libsql/client";
+   import fs from "fs";
+   const client = createClient({
+     url: process.env.TURSO_CONNECTION_URL!,
+     authToken: process.env.TURSO_AUTH_TOKEN
+   });
+   const sql = fs.readFileSync("drizzle/0000_xxxx.sql", "utf8");
+   for (const statement of sql.split(";")) {
+     if (statement.trim()) {
+       await client.execute(statement);
+     }
+   }
+   ```
+   Jalankan skrip tersebut menggunakan npx tsx <nama_berkas_skrip>.
 
 
 
----
 
-## 🚀 Contoh Penggunaan (Query)
+## Contoh Kode
 
-### Koneksi Database (`db/index.ts`)
+### Definisi Skema dan Relasi (`db/schema.ts`)
 
 ```ts
-import { createClient } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
-import * as schema from './schema';
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { relations } from "drizzle-orm";
 
-const client = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
-  authToken: process.env.TURSO_AUTH_TOKEN!,
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
-export const db = drizzle(client, { schema });
+export const posts = sqliteTable("posts", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  authorId: text("author_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
 
+export const usersRelations = relations(users, ({ many }) => ({
+  posts: many(posts),
+}));
+
+export const postsRelations = relations(posts, ({ one }) => ({
+  author: one(users, {
+    fields: [posts.authorId],
+    references: [users.id],
+  }),
+}));
 ```
 
 ### Operasi CRUD
 
 ```ts
 import { db } from "@/db";
-import { user } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { users, posts } from "@/db/schema";
+import { eq, desc, and } from "drizzle-orm";
 
-// 1. Ambil semua user
-const allUsers = await db.select().from(user);
+export async function getUserWithPosts(userId: string) {
+  return await db.query.users.findFirst({
+    where: eq(users.id, userId),
+    with: {
+      posts: {
+        orderBy: [desc(posts.createdAt)],
+        limit: 10,
+      },
+    },
+  });
+}
 
-// 2. Ambil dengan filter (Type-safe)
-const singleUser = await db.query.user.findFirst({
-    where: (user, { eq }) => eq(user.id, "123"),
-    with: { posts: true } // Mengambil relasi jika menggunakan Relations API
-});
+export async function createNewUserWithWelcomePost(
+  userId: string,
+  name: string,
+  email: string
+) {
+  return await db.transaction(async (tx) => {
+    await tx.insert(users).values({
+      id: userId,
+      name,
+      email,
+      createdAt: new Date(),
+    });
 
-// 3. Insert data
-await db.insert(user).values({
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-});
+    await tx.insert(posts).values({
+      id: `post-${userId}`,
+      title: "Selamat Datang",
+      content: "Terima kasih telah bergabung dengan platform kami.",
+      authorId: userId,
+      createdAt: new Date(),
+    });
+  });
+}
 
+export async function deletePostSecurely(postId: string, userId: string) {
+  return await db
+    .delete(posts)
+    .where(and(eq(posts.id, postId), eq(posts.authorId, userId)));
+}
 ```
-
----
-
-## 💡 Tips Modern & Best Practices
-
-* **Relations API**: Selalu definisikan `relations` di `schema.ts` untuk mempermudah query data bersarang (*nested data*) tanpa perlu join manual yang rumit.
-* **Batch Operations**: Turso mendukung transaksi batch. Jika ingin melakukan banyak insert, gunakan `db.batch([...])` untuk performa lebih maksimal di *edge network*.
-* **Zod Integration**: Gunakan `drizzle-zod` untuk membuat skema validasi form secara otomatis dari skema database Anda.
