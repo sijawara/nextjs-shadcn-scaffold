@@ -14,5 +14,6 @@ export const auth = betterAuth({
     trustedOrigins: [
         "*.e2b.app",
         "*.vercel.run",
+        "*localhost*"
     ]
 });
