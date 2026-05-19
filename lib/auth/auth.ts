@@ -10,5 +10,9 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
-    }
+    },
+    trustedOrigins: [
+        "*.e2b.app",
+        "*.vercel.run",
+    ]
 });
