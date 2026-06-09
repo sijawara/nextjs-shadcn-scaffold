@@ -20,16 +20,16 @@ export function HeroSection() {
             </p>
 
             <div className="mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-700">
-                <Link href="/products" className="w-full sm:w-auto">
-                    <Button size="lg" className="h-14 w-full sm:px-8 text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform">
+                <Button asChild size="lg" className="h-14 w-full sm:w-auto sm:px-8 text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform">
+                    <Link href="/products">
                         Get Started Now
-                    </Button>
-                </Link>
-                <Link href="/products" className="w-full sm:w-auto">
-                    <Button variant="outline" size="lg" className="h-14 w-full sm:px-8 text-lg font-bold rounded-xl border-2 hover:bg-muted transition-colors">
+                    </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="h-14 w-full sm:w-auto sm:px-8 text-lg font-bold rounded-xl border-2 hover:bg-muted transition-colors">
+                    <Link href="/products">
                         Explore Collection
-                    </Button>
-                </Link>
+                    </Link>
+                </Button>
             </div>
         </section>
     )
